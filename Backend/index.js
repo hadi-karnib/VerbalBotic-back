@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-
+import userRoutes from "./Routes/userRoutes.js";
 dotenv.config();
 const app = express();
 
@@ -23,9 +23,7 @@ mongoose
   .catch((err) => console.error("Could not connect to MongoDB...", err));
 
 // Example route
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
+app.use("/user", userRoutes);
 
 // Start server
 const PORT = process.env.PORT || 4001;
