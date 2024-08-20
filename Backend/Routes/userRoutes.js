@@ -14,9 +14,9 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 
-router.get("/", authMiddleware, getAllUsers); // Admin only
+router.get("/", authMiddleware, getAllUsers);
 router.get("/:id", authMiddleware, getUser);
-router.delete("/:id", authMiddleware, deleteUser); // Admin only
-router.get("/:id/chats", authMiddleware, getUserChats); // Protected route to get user chats
+router.delete("/:id", authMiddleware, deleteUser);
+router.get("/:id/chats", authMiddleware, getUserChats);
 
 export default router;
