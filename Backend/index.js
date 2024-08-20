@@ -1,7 +1,9 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
 
+dotenv.config();
 const app = express();
 
 // Middleware setup
@@ -13,7 +15,13 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(cookieParser());
+
+const mongoURI = process.env.MONGO_URI;
+
+mongoose
+  .connect(mongoURI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("Could not connect to MongoDB...", err));
 
 // Example route
 app.get("/", (req, res) => {
