@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import userRoutes from "./Routes/userRoutes.js";
 import childrenRoutes from "./Routes/childRoutes.js";
-
+import messageRoutes from "./Routes/messageRoutes.js";
 dotenv.config();
 const app = express();
 
