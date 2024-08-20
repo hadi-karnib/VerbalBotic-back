@@ -5,6 +5,14 @@ import { generateToken } from "../Middleware/authToken.js";
 export const signup = async (req, res) => {
   const { name, age, illness, UserType, email, password } = req.body;
 
+  // Simple email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Check if the email format is valid
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
