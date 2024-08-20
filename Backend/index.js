@@ -6,10 +6,9 @@ import userRoutes from "./Routes/userRoutes.js";
 dotenv.config();
 const app = express();
 
-// Middleware setup
 app.use(
   cors({
-    origin: "http://localhost:3000", // Adjust based on your frontend URL
+    origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -22,10 +21,8 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Could not connect to MongoDB...", err));
 
-// Example route
-app.use("/user", userRoutes);
+app.use("/api/user", userRoutes);
 
-// Start server
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
