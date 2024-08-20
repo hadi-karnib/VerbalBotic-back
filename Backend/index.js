@@ -25,6 +25,7 @@ mongoose
 
 app.use("/api/user", userRoutes);
 app.use("/api/children", childrenRoutes);
+app.use("/api/messages", messageRoutes);
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {
