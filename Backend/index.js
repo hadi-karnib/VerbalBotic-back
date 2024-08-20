@@ -15,7 +15,6 @@ app.use(
   })
 );
 app.use(express.json());
-
 const mongoURI = process.env.MONGO_URI;
 
 mongoose
