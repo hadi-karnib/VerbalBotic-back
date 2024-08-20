@@ -39,6 +39,7 @@ const UserSchema = new Schema({
   chat: {
     messages: {
       type: [MessageSchema],
+      default: [],
       select: false,
     },
   },
