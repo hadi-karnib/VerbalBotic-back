@@ -7,3 +7,5 @@ import {
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.post("/", authMiddleware, createVoiceNote);
