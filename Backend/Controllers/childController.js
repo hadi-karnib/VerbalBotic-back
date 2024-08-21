@@ -62,3 +62,18 @@ export const deleteChild = async (req, res) => {
       .json({ message: "Something went wrong", error: err.message });
   }
 };
+
+export const getChildren = async (req, res) => {
+  try {
+    const parent = await User.findById(req.user._id).populate("children");
+    if (!parent) {
+      return res.status(404).json({ message: "Parent user not found" });
+    }
+
+    res.status(200).json(parent.children);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Something went wrong", error: err.message });
+  }
+};
