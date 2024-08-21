@@ -74,6 +74,6 @@ export const getChildren = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ message: "Something went wrong", error: err.message });
+      .json({ message: "Something went wrong!", error: err.message });
   }
 };
