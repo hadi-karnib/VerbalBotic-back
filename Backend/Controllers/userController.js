@@ -36,11 +36,13 @@ export const signup = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.status(201).json({ token, user });
+    res.status(201).json({ success: true, token });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: err.message,
+    });
   }
 };
 
