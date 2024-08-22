@@ -6,6 +6,7 @@ import {
   getUser,
   deleteUser,
   getUserChats,
+  addBio,
 } from "../Controllers/userController.js";
 import { authMiddleware } from "../Middleware/authMiddleware.js";
 
@@ -16,7 +17,8 @@ router.post("/login", login);
 
 router.get("/", authMiddleware, getAllUsers);
 router.get("/:id", authMiddleware, getUser);
-router.delete("/:id", authMiddleware, deleteUser);
 router.get("/:id/chats", authMiddleware, getUserChats);
+router.put("/add-bio", authMiddleware, addBio);
+router.delete("/:id", authMiddleware, deleteUser);
 
 export default router;
