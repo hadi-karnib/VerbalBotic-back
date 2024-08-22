@@ -46,6 +46,11 @@ const UserSchema = new Schema({
         `${props.value} is not a valid Lebanese phone number!`,
     },
   },
+  bio: {
+    type: String,
+    required: false,
+  },
+
   children: [
     {
       type: Schema.Types.ObjectId,
