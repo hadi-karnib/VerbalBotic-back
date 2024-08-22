@@ -54,7 +54,10 @@ const UserSchema = new Schema({
     type: [String],
     required: false,
   },
-
+  work: {
+    type: String,
+    required: false,
+  },
   children: [
     {
       type: Schema.Types.ObjectId,
