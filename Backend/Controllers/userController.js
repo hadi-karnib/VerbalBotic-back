@@ -3,14 +3,21 @@ import User from "../Models/User.js";
 import { generateToken } from "../Middleware/authToken.js";
 
 export const signup = async (req, res) => {
-  const { name, age, illness, UserType, email, password } = req.body;
+  const { name, age, illness, UserType, email, password, phoneNumber } =
+    req.body;
 
-  // Simple email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex =
+    /^(?:\+961|961|0)?(81\d{6}|71\d{6}|76\d{6}|79\d{6}|3\d{6})$/;
 
-  // Check if the email format is valid
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: "Invalid email format" });
+  }
+
+  if (!phoneRegex.test(phoneNumber)) {
+    return res
+      .status(400)
+      .json({ message: "Invalid Lebanese phone number format" });
   }
 
   try {
@@ -28,6 +35,7 @@ export const signup = async (req, res) => {
       UserType,
       email,
       password: hashedPassword,
+      phoneNumber, // Add the phoneNumber field here
       children: [],
       chat: { messages: [] },
     });
