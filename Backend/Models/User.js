@@ -37,6 +37,7 @@ const UserSchema = new Schema({
   phoneNumber: {
     type: String,
     required: true,
+    unique: true,
     validate: {
       validator: function (v) {
         return lebanesePhoneRegex.test(v);
