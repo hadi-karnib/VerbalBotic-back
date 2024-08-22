@@ -50,6 +50,10 @@ const UserSchema = new Schema({
     type: String,
     required: false,
   },
+  hobbies: {
+    type: [String],
+    required: false,
+  },
 
   children: [
     {
