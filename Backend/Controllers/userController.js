@@ -139,3 +139,32 @@ export const getUserChats = async (req, res) => {
       .json({ message: "Something went wrong", error: err.message });
   }
 };
+
+export const addBio = async (req, res) => {
+  const { hobbies, work, illness, bio } = req.body;
+
+  try {
+    // Find the user by ID (extracted from the token by middleware)
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.hobbies = hobbies || user.hobbies;
+    user.work = work || user.work;
+    user.illness = illness || user.illness;
+    user.bio = bio || user.bio;
+
+    await user.save();
+
+    res.status(200).json({ success: true, data: user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: err.message,
+    });
+  }
+};
