@@ -91,7 +91,6 @@ export const updateAfterChatGPT = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Ensure chat and messages are defined
     if (!user.chat || !user.chat.messages) {
       return res.status(404).json({ message: "No messages found" });
     }
