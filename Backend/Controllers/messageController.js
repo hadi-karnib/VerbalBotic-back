@@ -1,31 +1,41 @@
 import User from "../Models/User.js";
+import { upload } from "../Middleware/multerConfig.js";
 
-export const createVoiceNote = async (req, res) => {
-  const { message, voiceNoteMetadata } = req.body;
+export const createVoiceNote = [
+  upload.single("voiceNote"),
+  async (req, res) => {
+    const { duration, format, size } = req.body;
 
-  try {
-    const user = await User.findById(req.user._id);
+    try {
+      const user = await User.findById(req.user._id);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const voiceNoteMetadata = {
+        duration,
+        format,
+        size,
+      };
+
+      const newMessage = {
+        message: req.file.path,
+        voiceNoteMetadata,
+      };
+
+      user.chat.messages.push(newMessage);
+
+      await user.save();
+
+      res.status(201).json(user.chat.messages[user.chat.messages.length - 1]);
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: "Failed to create voice note", error: err.message });
     }
-
-    const newMessage = {
-      message,
-      voiceNoteMetadata,
-    };
-
-    user.chat.messages.push(newMessage);
-
-    await user.save();
-
-    res.status(201).json(user.chat.messages[user.chat.messages.length - 1]);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Failed to create voice note", error: err.message });
-  }
-};
+  },
+];
 
 export const updateAfterAnalysis = async (req, res) => {
   const { messageId } = req.params;
