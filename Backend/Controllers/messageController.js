@@ -7,17 +7,16 @@ export const createVoiceNote = [
     const { duration, format, size } = req.body;
 
     try {
-      const user = await User.findById(req.user._id).select("chat.messages");
+      const user = await User.findById(req.user._id);
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Initialize chat.messages if it doesn't exist
       if (!user.chat) {
         user.chat = { messages: [] };
-      }
-
-      if (!user.chat.messages) {
+      } else if (!user.chat.messages) {
         user.chat.messages = [];
       }
 
@@ -27,18 +26,19 @@ export const createVoiceNote = [
         size,
       };
 
+      const messagePath = req.file.path.replace(/\\/g, "/"); // Replace backslashes with forward slashes
+
       const newMessage = {
-        message: req.file.path,
+        message: messagePath, // Store the path with forward slashes
         voiceNoteMetadata,
       };
 
-      user.chat.messages.push(newMessage);
+      user.chat.messages.push(newMessage); // Push the new message
 
-      await user.save();
+      await user.save(); // Save the updated user document
 
       res.status(201).json(user.chat.messages[user.chat.messages.length - 1]);
     } catch (err) {
-      console.error("Error creating voice note:", err);
       res
         .status(500)
         .json({ message: "Failed to create voice note", error: err.message });
