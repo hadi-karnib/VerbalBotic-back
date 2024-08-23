@@ -42,7 +42,6 @@ export const createVoiceNote = [
     }
   },
 ];
-
 export const updateAfterAnalysis = async (req, res) => {
   const { messageId } = req.params;
   const { diagnosis } = req.body;
@@ -54,7 +53,14 @@ export const updateAfterAnalysis = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const message = user.chat.messages.id(messageId);
+    if (!user.chat || !user.chat.messages) {
+      return res.status(404).json({ message: "No messages found" });
+    }
+
+    // Convert the messageId to a string and compare
+    const message = user.chat.messages.find(
+      (msg) => msg._id.toString() === messageId
+    );
 
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
@@ -81,6 +87,11 @@ export const updateAfterChatGPT = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Ensure chat and messages are defined
+    if (!user.chat || !user.chat.messages) {
+      return res.status(404).json({ message: "No messages found" });
     }
 
     const message = user.chat.messages.id(messageId);
