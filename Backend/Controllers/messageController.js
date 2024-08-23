@@ -112,3 +112,22 @@ export const updateAfterChatGPT = async (req, res) => {
       .json({ message: "Failed to update AI response", error: err.message });
   }
 };
+export const getMyChats = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("chat.messages");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.chat || !user.chat.messages.length) {
+      return res.status(404).json({ message: "No messages found" });
+    }
+
+    res.status(200).json(user.chat.messages);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve messages", error: err.message });
+  }
+};
