@@ -17,19 +17,4 @@ const storage = multer.diskStorage({
 export const upload = multer({
   storage: storage,
   limits: { fileSize: 1000000 },
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  },
 });
-
-function checkFileType(file, cb) {
-  const filetypes = /wav|mp3|m4a/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb("Error: Audio Files Only!");
-  }
-}
