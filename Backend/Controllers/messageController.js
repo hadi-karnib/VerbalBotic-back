@@ -1,6 +1,5 @@
 import User from "../Models/User.js";
 import { upload } from "../Middleware/multerConfig.js";
-
 export const createVoiceNote = [
   upload.single("voiceNote"),
   async (req, res) => {
@@ -13,6 +12,13 @@ export const createVoiceNote = [
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Initialize chat.messages if it doesn't exist
+      if (!user.chat) {
+        user.chat = { messages: [] };
+      } else if (!user.chat.messages) {
+        user.chat.messages = [];
+      }
+
       const voiceNoteMetadata = {
         duration,
         format,
@@ -20,13 +26,13 @@ export const createVoiceNote = [
       };
 
       const newMessage = {
-        message: req.file.path,
+        message: req.file.path, // Path of the uploaded voice note
         voiceNoteMetadata,
       };
 
-      user.chat.messages.push(newMessage);
+      user.chat.messages.push(newMessage); // Push the new message
 
-      await user.save();
+      await user.save(); // Save the updated user document
 
       res.status(201).json(user.chat.messages[user.chat.messages.length - 1]);
     } catch (err) {
