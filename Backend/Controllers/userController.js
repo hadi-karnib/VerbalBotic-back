@@ -144,7 +144,6 @@ export const addBio = async (req, res) => {
   const { hobbies, work, illness, bio } = req.body;
 
   try {
-    // Find the user by ID (extracted from the token by middleware)
     const user = await User.findById(req.user._id);
 
     if (!user) {
