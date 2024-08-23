@@ -51,7 +51,7 @@ export const updateAfterAnalysis = async (req, res) => {
   const { diagnosis } = req.body;
 
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("chat.messages");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -87,7 +87,7 @@ export const updateAfterChatGPT = async (req, res) => {
   const { AI_response } = req.body;
 
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("chat.messages");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
