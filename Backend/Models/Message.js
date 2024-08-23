@@ -5,15 +5,15 @@ const { Schema } = mongoose;
 const VoiceNoteMetadataSchema = new Schema({
   duration: {
     type: Number,
-    required: true,
+    required: false,
   },
   size: {
     type: Number,
-    required: true,
+    required: false,
   },
   format: {
     type: String,
-    required: true,
+    required: false,
   },
   uploadDate: {
     type: Date,
