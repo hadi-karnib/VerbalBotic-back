@@ -26,6 +26,7 @@ mongoose
 app.use("/api/user", userRoutes);
 app.use("/api/children", childrenRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {
