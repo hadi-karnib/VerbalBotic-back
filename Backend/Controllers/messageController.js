@@ -7,13 +7,12 @@ export const createVoiceNote = [
     const { duration, format, size } = req.body;
 
     try {
-      const user = await User.findById(req.user._id);
+      const user = await User.findById(req.user._id).select("chat.messages");
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Initialize chat.messages if it doesn't exist
       if (!user.chat) {
         user.chat = { messages: [] };
       } else if (!user.chat.messages) {
@@ -26,16 +25,16 @@ export const createVoiceNote = [
         size,
       };
 
-      const messagePath = req.file.path.replace(/\\/g, "/"); // Replace backslashes with forward slashes
+      const messagePath = req.file.path.replace(/\\/g, "/");
 
       const newMessage = {
-        message: messagePath, // Store the path with forward slashes
+        message: messagePath,
         voiceNoteMetadata,
       };
 
-      user.chat.messages.push(newMessage); // Push the new message
+      user.chat.messages.push(newMessage);
 
-      await user.save(); // Save the updated user document
+      await user.save();
 
       res.status(201).json(user.chat.messages[user.chat.messages.length - 1]);
     } catch (err) {
@@ -61,7 +60,6 @@ export const updateAfterAnalysis = async (req, res) => {
       return res.status(404).json({ message: "No messages found" });
     }
 
-    // Convert the messageId to a string and compare
     const message = user.chat.messages.find(
       (msg) => msg._id.toString() === messageId
     );
