@@ -1,21 +1,23 @@
 import User from "../Models/User.js";
 import { upload } from "../Middleware/multerConfig.js";
+
 export const createVoiceNote = [
   upload.single("voiceNote"),
   async (req, res) => {
     const { duration, format, size } = req.body;
 
     try {
-      const user = await User.findById(req.user._id);
+      const user = await User.findById(req.user._id).select("chat.messages");
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Initialize chat.messages if it doesn't exist
       if (!user.chat) {
         user.chat = { messages: [] };
-      } else if (!user.chat.messages) {
+      }
+
+      if (!user.chat.messages) {
         user.chat.messages = [];
       }
 
@@ -26,22 +28,24 @@ export const createVoiceNote = [
       };
 
       const newMessage = {
-        message: req.file.path, // Path of the uploaded voice note
+        message: req.file.path,
         voiceNoteMetadata,
       };
 
-      user.chat.messages.push(newMessage); // Push the new message
+      user.chat.messages.push(newMessage);
 
-      await user.save(); // Save the updated user document
+      await user.save();
 
       res.status(201).json(user.chat.messages[user.chat.messages.length - 1]);
     } catch (err) {
+      console.error("Error creating voice note:", err);
       res
         .status(500)
         .json({ message: "Failed to create voice note", error: err.message });
     }
   },
 ];
+
 export const updateAfterAnalysis = async (req, res) => {
   const { messageId } = req.params;
   const { diagnosis } = req.body;
