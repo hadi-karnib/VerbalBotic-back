@@ -35,7 +35,7 @@ export const signup = async (req, res) => {
       UserType,
       email,
       password: hashedPassword,
-      phoneNumber, // Add the phoneNumber field here
+      phoneNumber,
       children: [],
       chat: { messages: [] },
     });
