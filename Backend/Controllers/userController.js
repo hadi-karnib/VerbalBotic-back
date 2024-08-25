@@ -181,3 +181,35 @@ export const getSelf = async (req, res) => {
     });
   }
 };
+
+export const updateUser = async (req, res) => {
+  const { name, email, phoneNumber, bio, illness, work } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.bio = bio || user.bio;
+    user.illness = illness || user.illness;
+    user.work = work || user.work;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: err.message,
+    });
+  }
+};
