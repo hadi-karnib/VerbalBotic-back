@@ -222,3 +222,22 @@ export const updateUser = async (req, res) => {
     });
   }
 };
+
+const calcStreak = (user) => {
+  const currentDate = moment().startOf("day");
+  const lastLoginDate = moment(user.lastLogin).startOf("day");
+
+  const daysDifference = currentDate.diff(lastLoginDate, "days");
+
+  if (daysDifference === 1) {
+    user.streak = (user.streak || 0) + 1;
+  } else if (daysDifference > 1) {
+    user.streak = 1;
+  } else if (daysDifference === 0 && !user.streak) {
+    user.streak = 1;
+  }
+
+  user.lastLogin = moment().toDate();
+
+  return user.save();
+};
