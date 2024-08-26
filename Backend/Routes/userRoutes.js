@@ -8,6 +8,7 @@ import {
   getUserChats,
   addBio,
   getSelf,
+  updateUser,
 } from "../Controllers/userController.js";
 import { authMiddleware } from "../Middleware/authMiddleware.js";
 
@@ -21,6 +22,7 @@ router.get("/", authMiddleware, getAllUsers);
 router.get("/:id", authMiddleware, getUser);
 router.get("/:id/chats", authMiddleware, getUserChats);
 router.put("/add-bio", authMiddleware, addBio);
+router.patch("/", authMiddleware, updateUser);
 router.delete("/:id", authMiddleware, deleteUser);
 
 export default router;
