@@ -73,7 +73,7 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.status(200).json({ success: true, token });
+    res.status(200).json({ success: true, token, streak: user.streak });
   } catch (err) {
     res.status(500).json({
       success: false,
