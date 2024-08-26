@@ -31,7 +31,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use((req, res, next) => {
+  const now = new Date().toISOString();
+  console.log(`[${now}] ${req.method} ${req.url} ${JSON.stringify(req.body)}`);
+  next();
+});
 app.use("/api/user", userRoutes);
 app.use("/api/children", childrenRoutes);
 app.use("/api/messages", messageRoutes);
