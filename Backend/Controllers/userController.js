@@ -69,15 +69,9 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    await calcStreak(user);
+
     const token = generateToken(user);
-
-    if (!user.lastLogin) {
-      user.lastLogin = moment().toDate();
-    } else {
-      user.lastLogin = moment().toDate();
-    }
-
-    await user.save();
 
     res.status(200).json({ success: true, token });
   } catch (err) {
