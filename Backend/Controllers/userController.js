@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../Models/User.js";
 import { generateToken } from "../Middleware/authToken.js";
+import moment from "moment";
 
 export const signup = async (req, res) => {
   const { name, age, illness, UserType, email, password, phoneNumber } =
@@ -69,6 +70,16 @@ export const login = async (req, res) => {
     }
 
     const token = generateToken(user);
+
+    // Initialize lastLogin if it's not already set
+    if (!user.lastLogin) {
+      user.lastLogin = moment().toDate();
+    } else {
+      // Update lastLogin with the current date and time using moment
+      user.lastLogin = moment().toDate();
+    }
+
+    await user.save();
 
     res.status(200).json({ success: true, token });
   } catch (err) {
