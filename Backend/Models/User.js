@@ -75,6 +75,7 @@ const UserSchema = new Schema(
     lastLogin: {
       type: Date,
       required: false,
+      default: Date.now,
     },
     streak: {
       type: Number,
