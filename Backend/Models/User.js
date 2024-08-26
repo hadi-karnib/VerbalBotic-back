@@ -71,14 +71,14 @@ const UserSchema = new Schema(
         default: [],
         select: false,
       },
-      lastLogin: {
-        type: Date,
-        required: false,
-      },
-      streak: {
-        type: Number,
-        required: false,
-      },
+    },
+    lastLogin: {
+      type: Date,
+      required: false,
+    },
+    streak: {
+      type: Number,
+      required: false,
     },
   },
   {
