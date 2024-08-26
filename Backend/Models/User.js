@@ -70,6 +70,10 @@ const UserSchema = new Schema({
       default: [],
       select: false,
     },
+    lastLogin: {
+      type: Date,
+      required: false,
+    },
   },
 });
 
