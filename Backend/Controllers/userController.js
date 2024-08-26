@@ -71,11 +71,9 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    // Initialize lastLogin if it's not already set
     if (!user.lastLogin) {
       user.lastLogin = moment().toDate();
     } else {
-      // Update lastLogin with the current date and time using moment
       user.lastLogin = moment().toDate();
     }
 
