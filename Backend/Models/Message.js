@@ -21,23 +21,28 @@ const VoiceNoteMetadataSchema = new Schema({
   },
 });
 
-const MessageSchema = new Schema({
-  message: {
-    type: String,
-    required: true,
+const MessageSchema = new Schema(
+  {
+    message: {
+      type: String,
+      required: true,
+    },
+    diagnosis: {
+      type: String,
+      required: false,
+    },
+    AI_response: {
+      type: String,
+      required: false,
+    },
+    voiceNoteMetadata: {
+      type: VoiceNoteMetadataSchema,
+      required: true,
+    },
   },
-  diagnosis: {
-    type: String,
-    required: false,
-  },
-  AI_response: {
-    type: String,
-    required: false,
-  },
-  voiceNoteMetadata: {
-    type: VoiceNoteMetadataSchema,
-    required: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 export default MessageSchema;
