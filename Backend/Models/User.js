@@ -79,6 +79,7 @@ const UserSchema = new Schema(
     streak: {
       type: Number,
       required: false,
+      default: 0,
     },
   },
   {
