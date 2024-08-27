@@ -1,6 +1,7 @@
 import User from "../Models/User.js";
 import { upload } from "../Middleware/multerConfig.js";
 import getAdvice from "../CHAT_GPT/advice.js";
+
 export const createVoiceNote = [
   upload.single("voiceNote"),
   async (req, res) => {
@@ -82,7 +83,6 @@ export const updateAfterAnalysis = async (req, res) => {
 
 export const updateAfterChatGPT = async (req, res) => {
   const { messageId } = req.params;
-  const { AI_response } = req.body;
 
   try {
     const user = await User.findById(req.user._id).select("chat.messages");
