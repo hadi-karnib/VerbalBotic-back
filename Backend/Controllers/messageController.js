@@ -116,20 +116,17 @@ export const updateAfterChatGPT = async (req, res) => {
         .join(" ")}
       I have a speech impairment, stuttering. How can I fix it? 
       Maybe the advice can be connected to my work if applicable. 
-      Give me advice. I don’t want introductions, just what to do generally and maybe give me homework on what to do daily. 
+      Give me advice.You are my Speech Therapist, I don’t want introductions, just what to do generally and maybe give me homework on what to do daily. 
       Be creative. I just want what to do, no "here are tips" or something. 
       Make the answers concise and small, maybe 3 points excluding the homework if you want but make them unique. 
       Don't forget to give me a small schedule.
     `;
 
-    // Get advice from ChatGPT
     const AI_response = await getAdvice(prompt);
     message.AI_response = AI_response;
 
-    // Save the updated user document
     await user.save();
 
-    // Return the updated message with the new AI response
     res.status(200).json(message);
   } catch (err) {
     res
