@@ -45,7 +45,7 @@ export const signup = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.status(201).json({ success: true, token });
+    res.status(201).json({ success: true, token, UserType: user.UserType });
   } catch (err) {
     res.status(500).json({
       success: false,
