@@ -7,7 +7,6 @@ const getAdvice = async (user) => {
   const apiKey = CHATGPT_API;
   const model = CHAT_MODEL;
 
-  // Construct the context for the ChatGPT prompt
   let previousAdvice = "";
   if (user.chat && user.chat.messages.length > 0) {
     previousAdvice = user.chat.messages
