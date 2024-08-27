@@ -1,6 +1,6 @@
 import User from "../Models/User.js";
 import { upload } from "../Middleware/multerConfig.js";
-
+import getAdvice from "../CHAT_GPT/advice.js";
 export const createVoiceNote = [
   upload.single("voiceNote"),
   async (req, res) => {
