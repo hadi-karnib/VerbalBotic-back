@@ -103,7 +103,6 @@ export const updateAfterChatGPT = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // Create a prompt based on the user's details and previous AI responses
     const prompt = `
       My name is ${user.name}, I work as a ${user.work}. My bio is: "${
       user.bio
