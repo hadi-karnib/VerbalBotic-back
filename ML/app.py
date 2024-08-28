@@ -45,23 +45,23 @@ def analyze_stuttering(transcription: str) -> str:
         if i < len(words) - 1:
 
             if word == words[i + 1]:
-                return "Stuttering - Exact word repetition"
+                return "Stuttering"
 
 
             if fuzz.ratio(word, words[i + 1]) > 85:
-                return "Stuttering - Phonetic similarity"
+                return "Stuttering"
 
 
             if word not in COMMON_WORDS and word in words[i+1:i+5]:
-                return "Stuttering - Repeated within next 4 words"
+                return "Stuttering"
 
 
             if words[i + 1] in FILLER_WORDS:
-                return "Stuttering - Filler word after"
+                return "Stuttering"
 
 
             similarity_score = util.pytorch_cos_sim(semantic_model.encode(word), semantic_model.encode(words[i + 1]))
             if similarity_score > 0.85:
-                return "Stuttering - Semantic similarity"
+                return "Stuttering"
 
     return "Good Speech"
