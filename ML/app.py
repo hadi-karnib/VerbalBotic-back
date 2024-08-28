@@ -10,6 +10,9 @@ app = FastAPI()
 processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
 model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h")
 
+
+COMMON_WORDS = {"and", "the", "is", "in", "at", "of", "on", "for", "to", "a", "an"}
+
 @app.post("/transcribe/")
 async def transcribe_audio(file: UploadFile = File(...)):
     audio_bytes = io.BytesIO(await file.read())
@@ -27,4 +30,22 @@ async def transcribe_audio(file: UploadFile = File(...)):
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = processor.decode(predicted_ids[0])
 
-    return {"transcription": transcription}
+
+    result = analyze_stuttering(transcription)
+    
+    return {"transcription": transcription, "analysis": result}
+
+def analyze_stuttering(transcription: str) -> str:
+
+    words = transcription.lower().split()
+
+
+    for i, word in enumerate(words):
+
+        if i < len(words) - 1 and word == words[i + 1]:
+            return "Stuttering"
+
+        if word not in COMMON_WORDS and word in words[i+1:i+5]:
+            return "Stuttering"
+    
+    return "Good Speech"
