@@ -15,9 +15,9 @@ async def transcribe_audio(file: UploadFile = File(...)):
     audio_bytes = io.BytesIO(await file.read())
 
     audio = AudioSegment.from_file(audio_bytes, format=file.filename.split('.')[-1])
-    audio = audio.set_frame_rate(16000).set_channels(1)  # Ensure it's 16kHz and mono
+    audio = audio.set_frame_rate(16000).set_channels(1)
     samples = np.array(audio.get_array_of_samples(), dtype=np.int16)
-    samples = samples / np.iinfo(np.int16).max  # Normalize to [-1, 1]
+    samples = samples / np.iinfo(np.int16).max
 
     input_values = processor(samples, return_tensors="pt", sampling_rate=16000).input_values
 
