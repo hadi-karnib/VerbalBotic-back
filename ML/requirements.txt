@@ -7,3 +7,4 @@ uvicorn
 python-multipart
 pydub
 fuzzywuzzy
+sentence_transformers
