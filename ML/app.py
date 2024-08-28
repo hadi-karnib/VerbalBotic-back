@@ -1,18 +1,20 @@
 from fastapi import FastAPI, UploadFile, File
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, pipeline
 import torch
 from pydub import AudioSegment
 import numpy as np
 import io
 from fuzzywuzzy import fuzz
+from sentence_transformers import SentenceTransformer, util
 
 app = FastAPI()
 
 processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
 model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h")
-
+semantic_model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
 
 COMMON_WORDS = {"and", "the", "is", "in", "at", "of", "on", "for", "to", "a", "an"}
+FILLER_WORDS = {"um", "uh", "er", "ah", "like"}
 
 @app.post("/transcribe/")
 async def transcribe_audio(file: UploadFile = File(...)):
@@ -31,7 +33,6 @@ async def transcribe_audio(file: UploadFile = File(...)):
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = processor.decode(predicted_ids[0])
 
-
     result = analyze_stuttering(transcription)
     
     return {"transcription": transcription, "analysis": result}
@@ -40,16 +41,21 @@ def analyze_stuttering(transcription: str) -> str:
     words = transcription.lower().split()
 
     for i, word in enumerate(words):
-        # Check for adjacent exact repetition
         if i < len(words) - 1 and word == words[i + 1]:
-            return "Stuttering"
+            return "Stuttering - Exact word repetition"
 
-        # Check for adjacent phonetic similarity
-        if i < len(words) - 1 and fuzz.ratio(word, words[i + 1]) > 85:
-            return "Stuttering"
+        if fuzz.ratio(word, words[i + 1]) > 85:
+            return "Stuttering - Phonetic similarity"
 
-        # Check if the current word is repeated in the next 4 words, excluding common words
         if word not in COMMON_WORDS and word in words[i+1:i+5]:
-            return "Stuttering"
-    
+            return "Stuttering - Repeated within next 4 words"
+
+        if i < len(words) - 1 and words[i + 1] in FILLER_WORDS:
+            return "Stuttering - Filler word"
+
+        if i < len(words) - 1:
+            similarity_score = util.pytorch_cos_sim(semantic_model.encode(word), semantic_model.encode(words[i + 1]))
+            if similarity_score > 0.85:
+                return "Stuttering - Semantic similarity"
+
     return "Good Speech"
