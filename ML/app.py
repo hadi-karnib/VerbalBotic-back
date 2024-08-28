@@ -37,15 +37,18 @@ async def transcribe_audio(file: UploadFile = File(...)):
     return {"transcription": transcription, "analysis": result}
 
 def analyze_stuttering(transcription: str) -> str:
-
     words = transcription.lower().split()
 
-
     for i, word in enumerate(words):
-
+        # Check for adjacent exact repetition
         if i < len(words) - 1 and word == words[i + 1]:
             return "Stuttering"
 
+        # Check for adjacent phonetic similarity
+        if i < len(words) - 1 and fuzz.ratio(word, words[i + 1]) > 85:
+            return "Stuttering"
+
+        # Check if the current word is repeated in the next 4 words, excluding common words
         if word not in COMMON_WORDS and word in words[i+1:i+5]:
             return "Stuttering"
     
