@@ -1,14 +1,11 @@
 import { readFileSync } from "fs";
 import axios from "axios";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const apiKey = process.env.GOOGLE_API;
 
-async function transcribeAudio({ language, filePath }) {
+export async function transcribeAudio({ language, voiceNote }) {
   // Read the audio file
-  const file = readFileSync(filePath);
+  const file = readFileSync(voiceNote);
   const audioBytes = file.toString("base64");
 
   // Configure the request
@@ -38,7 +35,11 @@ async function transcribeAudio({ language, filePath }) {
       .join("\n");
 
     console.log(`Transcription: ${transcription || "No transcription found"}`);
-    return transcription;
+
+    return {
+      transcription: transcription || "No transcription found",
+      rawResponse: response.data,
+    };
   } catch (error) {
     console.error(
       "Error during transcription:",
