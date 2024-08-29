@@ -1,18 +1,18 @@
 import { readFileSync } from "fs";
 import axios from "axios";
 
-async function transcribeAudio(filePath) {
-  const apiKey = process.env.GOOGLE_API;
+const apiKey = process.env.GOOGLE_API;
 
-  // Read the file content
-  const file = readFileSync(filePath);
+async function transcribeAudio({ language, voiceNote }) {
+  const file = readFileSync(voiceNote);
   const audioBytes = file.toString("base64");
 
   const request = {
     config: {
       encoding: "MP3",
       sampleRateHertz: 16000,
-      languageCode: "en-US",
+      languageCode: language,
+      alternativeLanguageCodes: ["en-US", "fr-FR", "ar-LB"],
     },
     audio: {
       content: audioBytes,
@@ -27,12 +27,18 @@ async function transcribeAudio(filePath) {
 
     console.log("Raw Response:", response.data);
 
+    // Process the transcription results
     const transcription = response.data.results
       .map((result) => result.alternatives[0]?.transcript)
       .join("\n");
 
     console.log(`Transcription: ${transcription || "No transcription found"}`);
-    return transcription;
+
+    // Return as JSON
+    return {
+      transcription: transcription || "No transcription found",
+      rawResponse: response.data,
+    };
   } catch (error) {
     console.error(
       "Error during transcription:",
@@ -42,11 +48,14 @@ async function transcribeAudio(filePath) {
   }
 }
 
-// Example usage
-const audioFilePath =
-  "C:/Users/HadiK/Desktop/SEFInalVerbalbotic/VerbalBotic-back/Backend/uploads/voiceNote-1724925343255.m4a";
-transcribeAudio(audioFilePath)
-  .then((transcription) =>
-    console.log("Transcription completed successfully:", transcription)
-  )
-  .catch((err) => console.error("Failed to transcribe audio:", err));
+// Example usage:
+const audioFilePath = "path/to/your/audio/file.m4a";
+const language = "ar-LB"; // Main language for transcription
+
+transcribeAudio({ language, voiceNote: audioFilePath })
+  .then((transcriptionJson) => {
+    console.log("Transcription completed successfully:", transcriptionJson);
+  })
+  .catch((err) => {
+    console.error("Failed to transcribe audio:", err);
+  });
