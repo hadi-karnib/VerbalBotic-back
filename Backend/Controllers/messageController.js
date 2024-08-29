@@ -154,6 +154,21 @@ export const getMyChats = async (req, res) => {
   }
 };
 
+const COMMON_WORDS = [
+  "and",
+  "the",
+  "is",
+  "in",
+  "at",
+  "of",
+  "on",
+  "for",
+  "to",
+  "a",
+  "an",
+];
+const FILLER_WORDS = ["um", "uh", "er", "ah", "like"];
+
 export const transcribeAudioGoogle = async (req, res) => {
   const { language, messageId } = req.body;
 
@@ -179,11 +194,50 @@ export const transcribeAudioGoogle = async (req, res) => {
       voiceNote: audioPath,
     });
 
-    // Return the transcription result as JSON
-    res.status(200).json({ transcription: transcriptionResult.transcription });
+    // Perform stuttering analysis
+    const stutteringAnalysis = analyzeStuttering(
+      transcriptionResult.transcription
+    );
+
+    // Return the transcription result and stuttering analysis as JSON
+    res.status(200).json({
+      transcription: transcriptionResult,
+      analysis: stutteringAnalysis,
+    });
   } catch (error) {
     res
       .status(500)
       .json({ message: "Transcription failed", error: error.message });
   }
 };
+
+function analyzeStuttering(transcription) {
+  const words = transcription.split(" ").filter((word) => word.trim() !== "");
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+
+    // Skip common words unless they are repeated adjacently
+    if (COMMON_WORDS.includes(word)) {
+      if (i < words.length - 1 && word === words[i + 1]) {
+        return "Stuttering";
+      }
+      continue;
+    }
+
+    // Check if the word appears again within the next 4 words
+    const nextWords = words
+      .slice(i + 1, i + 5)
+      .filter((w) => !COMMON_WORDS.includes(w));
+    if (nextWords.includes(word)) {
+      return "Stuttering";
+    }
+
+    // Additional check for filler words adjacent to the current word
+    if (FILLER_WORDS.includes(words[i + 1])) {
+      return "Stuttering";
+    }
+  }
+
+  return "Good Speech";
+}
