@@ -179,12 +179,8 @@ export const transcribeAudioGoogle = async (req, res) => {
       voiceNote: audioPath,
     });
 
-    // Update the message with the transcription result
-    message.transcription = transcriptionResult.transcription;
-
-    await user.save();
-
-    res.status(200).json({ message: "Transcription completed", message });
+    // Return the transcription result as JSON
+    res.status(200).json({ transcription: transcriptionResult.transcription });
   } catch (error) {
     res
       .status(500)
