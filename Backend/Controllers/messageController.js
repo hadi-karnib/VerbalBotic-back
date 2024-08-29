@@ -1,6 +1,7 @@
 import User from "../Models/User.js";
 import { upload } from "../Middleware/multerConfig.js";
 import getAdvice from "../CHAT_GPT/advice.js";
+import { transcribeAudio } from "../GoogleModel/transcribe_Google.js";
 
 export const createVoiceNote = [
   upload.single("voiceNote"),
@@ -150,5 +151,43 @@ export const getMyChats = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to retrieve messages", error: err.message });
+  }
+};
+
+export const transcribeAudioGoogle = async (req, res) => {
+  const { language, messageId } = req.body;
+
+  try {
+    // Find the user and their message
+    const user = await User.findById(req.user._id).select("chat.messages");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const message = user.chat.messages.id(messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    const audioPath = message.message;
+
+    // Call the transcribe function
+    const transcriptionResult = await transcribeAudio({
+      language,
+      voiceNote: audioPath,
+    });
+
+    // Update the message with the transcription result
+    message.transcription = transcriptionResult.transcription;
+
+    await user.save();
+
+    res.status(200).json({ message: "Transcription completed", message });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Transcription failed", error: error.message });
   }
 };
