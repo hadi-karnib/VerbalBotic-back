@@ -187,14 +187,22 @@ export const transcribeAudioGoogle = async (req, res) => {
 
     const audioPath = message.message;
 
+    // Perform transcription
     const transcriptionResult = await transcribeAudio({
       language,
       voiceNote: audioPath,
     });
 
+    // Perform stuttering analysis
     const stutteringAnalysis = analyzeStuttering(
       transcriptionResult.transcription
     );
+
+    // Update the message with the diagnosis
+    message.diagnosis = stutteringAnalysis;
+
+    // Save the updated user document
+    await user.save();
 
     res.status(200).json({
       transcription: transcriptionResult,
