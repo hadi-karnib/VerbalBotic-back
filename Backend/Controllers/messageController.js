@@ -173,7 +173,6 @@ export const transcribeAudioGoogle = async (req, res) => {
   const { language, messageId } = req.body;
 
   try {
-    // Find the user and their message
     const user = await User.findById(req.user._id).select("chat.messages");
 
     if (!user) {
@@ -188,18 +187,15 @@ export const transcribeAudioGoogle = async (req, res) => {
 
     const audioPath = message.message;
 
-    // Call the transcribe function
     const transcriptionResult = await transcribeAudio({
       language,
       voiceNote: audioPath,
     });
 
-    // Perform stuttering analysis
     const stutteringAnalysis = analyzeStuttering(
       transcriptionResult.transcription
     );
 
-    // Return the transcription result and stuttering analysis as JSON
     res.status(200).json({
       transcription: transcriptionResult,
       analysis: stutteringAnalysis,
@@ -217,7 +213,6 @@ function analyzeStuttering(transcription) {
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
 
-    // Skip common words unless they are repeated adjacently
     if (COMMON_WORDS.includes(word)) {
       if (i < words.length - 1 && word === words[i + 1]) {
         return "Stuttering";
@@ -225,7 +220,6 @@ function analyzeStuttering(transcription) {
       continue;
     }
 
-    // Check if the word appears again within the next 4 words
     const nextWords = words
       .slice(i + 1, i + 5)
       .filter((w) => !COMMON_WORDS.includes(w));
@@ -233,7 +227,6 @@ function analyzeStuttering(transcription) {
       return "Stuttering";
     }
 
-    // Additional check for filler words adjacent to the current word
     if (FILLER_WORDS.includes(words[i + 1])) {
       return "Stuttering";
     }
