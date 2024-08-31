@@ -105,7 +105,12 @@ export const updateAfterChatGPT = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // Choose a prompt based on the diagnosis
+    // console.log(
+    //   user.chat.messages
+    //     .map((msg) => msg.AI_response)
+    //     .filter(Boolean)
+    //     .join(" ")
+    // );
     let prompt = "";
     if (diagnosis === "Good Speech") {
       prompt = `
