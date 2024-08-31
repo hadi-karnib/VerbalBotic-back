@@ -3,23 +3,9 @@ import axios from "axios";
 const CHATGPT_API = process.env.CHATGPT_API;
 const CHAT_MODEL = process.env.CHAT_MODEL || "gpt-3.5-turbo";
 
-const getAdvice = async (user) => {
+const getAdvice = async (prompt) => {
   const apiKey = CHATGPT_API;
   const model = CHAT_MODEL;
-
-  let previousAdvice = "";
-  if (user.chat && user.chat.messages.length > 0) {
-    previousAdvice = user.chat.messages
-      .map((message) => message.AI_response)
-      .join(" ");
-  }
-
-  const prompt = `
-    I have a speech impairment, specifically stuttering. How can I fix it? Please connect the advice to my work (${user.work}) if applicable. 
-    Here's what you've told me before: ${previousAdvice}.
-    I don't want introductions, just actionable advice on what I can do generally. Additionally, provide a small daily homework schedule.
-    Make the answers concise and unique, avoid repetition. Provide up to three points excluding the homework.
-  `;
 
   const url = "https://api.openai.com/v1/chat/completions";
 
