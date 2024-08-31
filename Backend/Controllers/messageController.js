@@ -84,6 +84,7 @@ export const updateAfterAnalysis = async (req, res) => {
 
 export const updateAfterChatGPT = async (req, res) => {
   const { messageId } = req.params;
+  const { diagnosis } = req.body;
 
   try {
     const user = await User.findById(req.user._id).select(
@@ -104,23 +105,45 @@ export const updateAfterChatGPT = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    const prompt = `
-      My name is ${user.name}, I work as a ${user.work}. My bio is: "${
-      user.bio
-    }". 
-      My speech illness is "${user.illness || "None"}". 
-      Here are my previous instructions:
-      ${user.chat.messages
-        .map((msg) => msg.AI_response)
-        .filter(Boolean)
-        .join(" ")}
-      I have a speech impairment, stuttering. How can I fix it? 
-      Maybe the advice can be connected to my work if applicable. 
-      Give me advice.You are my Speech Therapist, I don’t want introductions, just what to do generally and maybe give me homework on what to do daily. 
-      Be creative. I just want what to do, no "here are tips" or something. 
-      Make the answers concise and small, maybe 3 points excluding the homework if you want but make them unique. 
-      Don't forget to give me a small schedule.
-    `;
+    // Choose a prompt based on the diagnosis
+    let prompt = "";
+    if (diagnosis === "Good Speech") {
+      prompt = `
+        My name is ${user.name}, I work as a ${user.work}. My bio is: "${
+        user.bio
+      }". 
+        My speech illness was diagnosed as "${diagnosis}". 
+        Here are my previous instructions:
+        ${user.chat.messages
+          .map((msg) => msg.AI_response)
+          .filter(Boolean)
+          .join(" ")}
+        I have been told my speech is good, but I want to improve even more. 
+        What additional steps can I take to continue improving my speech?
+        Provide three concise and actionable pieces of advice that I can work on daily. 
+        Also, include a small homework schedule to follow. 
+        Be creative and specific to my work if possible.
+        Start the message with "You seem to have Good Speech"
+      `;
+    } else if (diagnosis === "Stuttering") {
+      prompt = `
+        My name is ${user.name}, I work as a ${user.work}. My bio is: "${
+        user.bio
+      }". 
+        My speech illness is "${user.illness || "Stuttering"}". 
+        Here are my previous instructions:
+        ${user.chat.messages
+          .map((msg) => msg.AI_response)
+          .filter(Boolean)
+          .join(" ")}
+        I have a stuttering problem. How can I fix it? 
+        Please provide three concise, actionable points. 
+        Also, give me a daily homework schedule to follow.
+        Be direct, and make sure the advice is applicable to my daily work.
+        Start the message with "You seem to have Stuttering Speech"
+
+      `;
+    }
 
     const AI_response = await getAdvice(prompt);
     message.AI_response = AI_response;
@@ -134,6 +157,7 @@ export const updateAfterChatGPT = async (req, res) => {
       .json({ message: "Failed to update AI response", error: err.message });
   }
 };
+
 export const getMyChats = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("chat.messages");
