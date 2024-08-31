@@ -128,6 +128,7 @@ export const updateAfterChatGPT = async (req, res) => {
         Provide three concise and actionable pieces of advice that I can work on daily. 
         Also, include a small homework schedule to follow. 
         Be creative and specific to my work if possible.
+        Dont't tell me to seek a specialist.
         Start the message with "You seem to have Good Speech"
       `;
     } else if (diagnosis === "Stuttering") {
