@@ -284,11 +284,18 @@ export const fetchChildChats = async (req, res) => {
       return res.status(404).json({ message: "Parent user not found" });
     }
 
+    // Log to check if the childId is present in the parent's children array
+    console.log("Children IDs in parent's record:", user.children);
+    console.log("Requested child ID:", childId);
+
     // Check if the provided child ID exists in the user's children array
     const child = await User.findOne({
       _id: childId,
       _id: { $in: user.children },
-    }).select("chat.messages");
+    }).select("+chat.messages"); // Explicitly select chat.messages
+
+    // Log to check if child was found
+    console.log("Child found:", child);
 
     if (!child) {
       return res
@@ -305,6 +312,7 @@ export const fetchChildChats = async (req, res) => {
     // Return the child's chat messages
     res.status(200).json(child.chat.messages);
   } catch (err) {
+    console.error("Error retrieving child's chats:", err);
     res.status(500).json({
       message: "Failed to retrieve child's messages",
       error: err.message,
