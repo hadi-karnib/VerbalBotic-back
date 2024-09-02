@@ -272,3 +272,42 @@ function analyzeStuttering(transcription) {
 
   return "Good Speech";
 }
+
+export const fetchChildChats = async (req, res) => {
+  const { childId } = req.body;
+
+  try {
+    // Find the parent user by their ID
+    const user = await User.findById(req.user._id).select("children");
+
+    if (!user) {
+      return res.status(404).json({ message: "Parent user not found" });
+    }
+
+    // Check if the provided child ID exists in the user's children array
+    const child = await User.findOne({
+      _id: childId,
+      _id: { $in: user.children },
+    }).select("chat.messages");
+
+    if (!child) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized access to this child's chats" });
+    }
+
+    if (!child.chat || !child.chat.messages.length) {
+      return res
+        .status(404)
+        .json({ message: "No messages found for this child" });
+    }
+
+    // Return the child's chat messages
+    res.status(200).json(child.chat.messages);
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to retrieve child's messages",
+      error: err.message,
+    });
+  }
+};
