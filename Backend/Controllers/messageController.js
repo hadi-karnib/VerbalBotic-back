@@ -278,29 +278,28 @@ export const fetchChildChats = async (req, res) => {
 
   try {
     // Find the parent user by their ID
-    const user = await User.findById(req.user._id).select("children");
+    const parent = await User.findById(req.user._id).select("children");
 
-    if (!user) {
+    if (!parent) {
       return res.status(404).json({ message: "Parent user not found" });
     }
 
-    // Log to check if the childId is present in the parent's children array
-    console.log("Children IDs in parent's record:", user.children);
-    console.log("Requested child ID:", childId);
+    // Check if the provided child ID exists in the parent's children array
+    const isChild = parent.children.some(
+      (id) => id.toString() === childId.toString()
+    );
 
-    // Check if the provided child ID exists in the user's children array
-    const child = await User.findOne({
-      _id: childId,
-      _id: { $in: user.children },
-    }).select("+chat.messages"); // Explicitly select chat.messages
-
-    // Log to check if child was found
-    console.log("Child found:", child);
-
-    if (!child) {
+    if (!isChild) {
       return res
         .status(403)
         .json({ message: "Unauthorized access to this child's chats" });
+    }
+
+    // Now fetch the child's chat messages
+    const child = await User.findById(childId).select("+chat.messages");
+
+    if (!child) {
+      return res.status(404).json({ message: "Child user not found" });
     }
 
     if (!child.chat || !child.chat.messages.length) {
