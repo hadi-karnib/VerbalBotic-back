@@ -8,6 +8,8 @@ const getParentAdvice = async (prompt) => {
   const model = CHAT_MODEL;
 
   const url = "https://api.openai.com/v1/chat/completions";
+  try {
+  } catch (error) {}
 };
 
 export default getAdvice;
