@@ -4,17 +4,15 @@ import axios from "axios";
 const apiKey = process.env.GOOGLE_API;
 
 export async function transcribeAudio({ language, voiceNote }) {
-  // Read the audio file
   const file = readFileSync(voiceNote);
   const audioBytes = file.toString("base64");
 
-  // Configure the request
   const request = {
     config: {
       encoding: "MP3",
       sampleRateHertz: 16000,
       languageCode: language,
-      alternativeLanguageCodes: ["en-US", "fr-FR"], // English and French as alternatives
+      alternativeLanguageCodes: ["en-US", "fr-FR"],
     },
     audio: {
       content: audioBytes,
@@ -22,7 +20,6 @@ export async function transcribeAudio({ language, voiceNote }) {
   };
 
   try {
-    // Send the request to the Google Speech-to-Text API
     const response = await axios.post(
       `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`,
       request
