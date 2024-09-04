@@ -12,7 +12,7 @@ export async function transcribeAudio({ language, voiceNote }) {
       encoding: "MP3",
       sampleRateHertz: 16000,
       languageCode: language,
-      alternativeLanguageCodes: ["en-US", "fr-FR"],
+      alternativeLanguageCodes: ["en-US", "fr-FR", "ar-LB"],
     },
     audio: {
       content: audioBytes,
