@@ -9,7 +9,28 @@ const getParentAdvice = async (prompt) => {
 
   const url = "https://api.openai.com/v1/chat/completions";
   try {
-  } catch (error) {}
+    const response = await axios.post(
+      url,
+      {
+        model: model,
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 1000,
+        temperature: 0.7,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const advice = response.data.choices[0].message.content.trim();
+    return advice;
+  } catch (error) {
+    console.error("Error fetching advice:", error);
+    return "Sorry, I couldn't fetch advice at the moment.";
+  }
 };
 
 export default getAdvice;
