@@ -3,6 +3,7 @@ import {
   createVoiceNote,
   fetchChildChats,
   getMyChats,
+  parentAdvice,
   transcribeAudioGoogle,
   updateAfterAnalysis,
   updateAfterChatGPT,
@@ -13,6 +14,8 @@ const router = express.Router();
 
 router.post("/", authMiddleware, createVoiceNote);
 router.post("/transcribeGoogle", authMiddleware, transcribeAudioGoogle);
+router.post("/", authMiddleware, parentAdvice);
+
 
 router.get("/", authMiddleware, getMyChats);
 router.post("/child-chats", authMiddleware, fetchChildChats);
