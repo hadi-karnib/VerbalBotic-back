@@ -8,17 +8,20 @@ import {
   updateAfterAnalysis,
   updateAfterChatGPT,
 } from "../Controllers/messageController.js";
-import { authMiddleware } from "../Middleware/authMiddleware.js";
+import {
+  authMiddleware,
+  parentMiddleware,
+} from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/", authMiddleware, createVoiceNote);
 router.post("/transcribeGoogle", authMiddleware, transcribeAudioGoogle);
-router.post("/", authMiddleware, parentAdvice);
-
+router.post("/child-chats", authMiddleware, parentMiddleware, fetchChildChats);
+router.post("/parentAdvice", authMiddleware, parentMiddleware, parentAdvice);
 
 router.get("/", authMiddleware, getMyChats);
-router.post("/child-chats", authMiddleware, fetchChildChats);
+
 router.patch("/:messageId/analysis", authMiddleware, updateAfterAnalysis);
 router.patch("/:messageId/chatgpt", authMiddleware, updateAfterChatGPT);
 
