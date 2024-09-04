@@ -337,7 +337,7 @@ export const parentAdvice = async (req, res) => {
       : "";
 
     const parentPrompt = `
-      I'm a parent seeking advice on how to help my child with speech improvement.
+      I'm a parent seeking advice on how to help my child with speech improvement.i dont want any introductions just start with the main point.
       My background: I work as ${
         parent.work || "unspecified work"
       }, and my bio is: "${parent.bio || "unspecified bio"}".
