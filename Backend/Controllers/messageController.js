@@ -2,7 +2,7 @@ import User from "../Models/User.js";
 import { upload } from "../Middleware/multerConfig.js";
 import getAdvice from "../CHAT_GPT/advice.js";
 import { transcribeAudio } from "../GoogleModel/transcribe_Google.js";
-
+import getParentAdvice from "../CHAT_GPT/ParentAdvice.js";
 export const createVoiceNote = [
   upload.single("voiceNote"),
   async (req, res) => {
@@ -311,4 +311,6 @@ export const fetchChildChats = async (req, res) => {
   }
 };
 
-export const parentAdvice = async (req, res) => {};
+export const parentAdvice = async (req, res) => {
+  const { prompt } = req.body;
+};
