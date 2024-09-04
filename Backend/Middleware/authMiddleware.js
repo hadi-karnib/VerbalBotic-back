@@ -20,4 +20,13 @@ export const authMiddleware = async (req, res, next) => {
   }
 };
 
-export const parentMiddleware = async (req, res, next) => {};
+export const parentMiddleware = async (req, res, next) => {
+  // Assuming that req.user is set by authMiddleware
+  if (req.user && req.user.UserType === "parent") {
+    next(); // If the user is a parent, allow them to proceed
+  } else {
+    return res
+      .status(403)
+      .json({ message: "Access denied, only parents are allowed" });
+  }
+};
