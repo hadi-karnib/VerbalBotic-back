@@ -312,10 +312,9 @@ export const fetchChildChats = async (req, res) => {
 };
 
 export const parentAdvice = async (req, res) => {
-  const { prompt } = req.body; // Prompt comes from the parent's input
+  const { prompt } = req.body;
 
   try {
-    // Find the parent user
     const parent = await User.findById(req.user._id).select(
       "chat.messages name bio work"
     );
@@ -324,26 +323,22 @@ export const parentAdvice = async (req, res) => {
       return res.status(404).json({ message: "Parent user not found" });
     }
 
-    // If the parent has no chat or messages, return a message
     if (!parent.chat || !parent.chat.messages.length) {
       return res
         .status(404)
         .json({ message: "No previous chat messages found for the parent" });
     }
 
-    // Extract previous AI responses from the parent's chat
     const previousAIResponses = parent.chat.messages
       .map((msg) => msg.AI_response)
-      .filter(Boolean) // Only include existing responses
+      .filter(Boolean)
       .join(" ");
 
-    // Filter out repetitive words by splitting, removing duplicates, and joining again
     const filteredPreviousResponses = previousAIResponses
       .split(" ")
       .filter((word, index, self) => self.indexOf(word) === index)
       .join(" ");
 
-    // Create the prompt for ChatGPT
     const parentPrompt = `
       I'm a parent seeking advice on how to help my child with speech improvement.
       My background: I work as ${parent.work}, and my bio is: "${parent.bio}".
@@ -351,10 +346,8 @@ export const parentAdvice = async (req, res) => {
       The following is what I need further advice on: "${prompt}".
     `;
 
-    // Send the constructed prompt to the ChatGPT API
     const advice = await getParentAdvice(parentPrompt);
 
-    // Send back the advice to the parent
     res.status(200).json({ advice });
   } catch (error) {
     console.error("Error fetching parent advice:", error);
