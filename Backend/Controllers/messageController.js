@@ -217,21 +217,17 @@ export const transcribeAudioGoogle = async (req, res) => {
 
     const audioPath = message.message;
 
-    // Perform transcription
     const transcriptionResult = await transcribeAudio({
       language,
       voiceNote: audioPath,
     });
 
-    // Perform stuttering analysis
     const stutteringAnalysis = analyzeStuttering(
       transcriptionResult.transcription
     );
 
-    // Update the message with the diagnosis
     message.diagnosis = stutteringAnalysis;
 
-    // Save the updated user document
     await user.save();
 
     res.status(200).json({
@@ -305,7 +301,6 @@ export const fetchChildChats = async (req, res) => {
         .json({ message: "No messages found for this child" });
     }
 
-    // Return the child's chat messages
     res.status(200).json(child.chat.messages);
   } catch (err) {
     console.error("Error retrieving child's chats:", err);
@@ -315,3 +310,5 @@ export const fetchChildChats = async (req, res) => {
     });
   }
 };
+
+export const parentAdvice = async (req, res) => {};
