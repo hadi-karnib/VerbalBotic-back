@@ -33,4 +33,4 @@ const getParentAdvice = async (prompt) => {
   }
 };
 
-export default getAdvice;
+export default getParentAdvice;
