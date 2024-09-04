@@ -313,4 +313,10 @@ export const fetchChildChats = async (req, res) => {
 
 export const parentAdvice = async (req, res) => {
   const { prompt } = req.body;
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {}
 };
