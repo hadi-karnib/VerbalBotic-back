@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  adminMessages,
   createVoiceNote,
   fetchChildChats,
   getMyChats,
@@ -19,6 +20,7 @@ router.post("/", authMiddleware, createVoiceNote);
 router.post("/transcribeGoogle", authMiddleware, transcribeAudioGoogle);
 router.post("/child-chats", authMiddleware, parentMiddleware, fetchChildChats);
 router.post("/parentAdvice", authMiddleware, parentMiddleware, parentAdvice);
+router.post("/parentMessage", authMiddleware, parentMiddleware, adminMessages);
 
 router.get("/", authMiddleware, getMyChats);
 
