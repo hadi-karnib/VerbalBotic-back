@@ -359,3 +359,36 @@ export const parentAdvice = async (req, res) => {
       .json({ message: "Failed to retrieve advice", error: error.message });
   }
 };
+
+export const adminMessages = async (req, res) => {
+  const { messageContent } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id).select("chat.messages");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.chat) {
+      user.chat = { messages: [] };
+    } else if (!user.chat.messages) {
+      user.chat.messages = [];
+    }
+
+    const newMessage = {
+      message: messageContent, // Only the message content for admin messages
+    };
+
+    user.chat.messages.push(newMessage);
+
+    await user.save();
+
+    res.status(201).json(user.chat.messages[user.chat.messages.length - 1]);
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to create admin message",
+      error: err.message,
+    });
+  }
+};
