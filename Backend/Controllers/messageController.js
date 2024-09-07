@@ -377,7 +377,7 @@ export const adminMessages = async (req, res) => {
     }
 
     const newMessage = {
-      message: messageContent, // Only the message content for admin messages
+      message: messageContent,
     };
 
     user.chat.messages.push(newMessage);
