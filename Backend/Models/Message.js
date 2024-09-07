@@ -37,7 +37,7 @@ const MessageSchema = new Schema(
     },
     voiceNoteMetadata: {
       type: VoiceNoteMetadataSchema,
-      required: true,
+      required: false,
     },
   },
   {
