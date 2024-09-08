@@ -315,7 +315,6 @@ export const parentAdvice = async (req, res) => {
   const { prompt, messageId } = req.body;
 
   try {
-    // Find the parent by user ID
     const parent = await User.findById(req.user._id).select(
       "chat.messages name bio work"
     );
@@ -324,7 +323,6 @@ export const parentAdvice = async (req, res) => {
       return res.status(404).json({ message: "Parent user not found" });
     }
 
-    // Find the message by messageId
     const message = parent.chat.messages.id(messageId);
 
     if (!message) {
