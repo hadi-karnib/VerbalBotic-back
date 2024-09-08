@@ -359,13 +359,10 @@ export const parentAdvice = async (req, res) => {
       The following is what I need further advice on: "${prompt}".
     `;
 
-    // Get AI response
     const AI_response = await getParentAdvice(parentPrompt);
 
-    // Save the AI response into the message
     message.AI_response = AI_response;
 
-    // Save the user with updated chat messages
     await parent.save();
 
     res.status(200).json(message);
