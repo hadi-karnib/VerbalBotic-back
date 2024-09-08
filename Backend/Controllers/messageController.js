@@ -311,8 +311,6 @@ export const fetchChildChats = async (req, res) => {
   }
 };
 
-import getParentAdvice from "../CHAT_GPT/ParentAdvice.js";
-
 export const parentAdvice = async (req, res) => {
   const { prompt, messageId } = req.body;
 
