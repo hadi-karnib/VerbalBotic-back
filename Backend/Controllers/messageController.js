@@ -311,16 +311,26 @@ export const fetchChildChats = async (req, res) => {
   }
 };
 
+import getParentAdvice from "../CHAT_GPT/ParentAdvice.js";
+
 export const parentAdvice = async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, messageId } = req.body;
 
   try {
+    // Find the parent by user ID
     const parent = await User.findById(req.user._id).select(
       "chat.messages name bio work"
     );
 
     if (!parent) {
       return res.status(404).json({ message: "Parent user not found" });
+    }
+
+    // Find the message by messageId
+    const message = parent.chat.messages.id(messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
     }
 
     const previousAIResponses =
@@ -337,7 +347,7 @@ export const parentAdvice = async (req, res) => {
       : "";
 
     const parentPrompt = `
-      I'm a parent seeking advice on how to help my child with speech improvement.i dont want any introductions just start with the main point.
+      I'm a parent seeking advice on how to help my child with speech improvement. I don't want any introductions, just start with the main point.
       My background: I work as ${
         parent.work || "unspecified work"
       }, and my bio is: "${parent.bio || "unspecified bio"}".
@@ -349,9 +359,16 @@ export const parentAdvice = async (req, res) => {
       The following is what I need further advice on: "${prompt}".
     `;
 
-    const advice = await getParentAdvice(parentPrompt);
+    // Get AI response
+    const AI_response = await getParentAdvice(parentPrompt);
 
-    res.status(200).json({ advice });
+    // Save the AI response into the message
+    message.AI_response = AI_response;
+
+    // Save the user with updated chat messages
+    await parent.save();
+
+    res.status(200).json(message);
   } catch (error) {
     console.error("Error fetching parent advice:", error);
     res
