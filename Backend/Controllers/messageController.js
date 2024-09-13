@@ -105,64 +105,94 @@ export const updateAfterChatGPT = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
+    // Format old homework to include in the prompt
+    const oldHomeworkDescriptions = user.dailyHomework
+      .map((hw, index) => {
+        return `Homework ${index + 1}: ${hw.title} - ${hw.description}, for ${
+          hw.timeInMinutes
+        } minutes.`;
+      })
+      .join("\n");
+
     let prompt = "";
     if (diagnosis === "Good Speech") {
       prompt = `
-         My name is ${user.name}, I work as a ${user.work}. My bio is: "${
+        My name is ${user.name}, I work as a ${user.work}. My bio is: "${
         user.bio
       }". 
-    My speech illness was diagnosed as "${diagnosis}". 
-    Here are my previous instructions:
-    ${user.chat.messages
-      .map((msg) => msg.AI_response)
-      .filter(Boolean)
-      .join(" ")}
-    I have been told my speech is good, but I want to improve even more. 
-    What additional steps can I take to continue improving my speech?
+        My speech illness was diagnosed as "${diagnosis}". 
+        Here are my previous instructions:
+        ${user.chat.messages
+          .map((msg) => msg.AI_response)
+          .filter(Boolean)
+          .join(" ")}
 
-    Provide three concise and actionable pieces of advice that I can work on daily. 
-    Also, include a small homework schedule. 
-    Structure the response so that the first part contains the advice text and the second part, clearly labeled "JSON_START", includes the daily homework as a single JSON array.
-    Example format:
-    "Here is the advice part..." 
-    JSON_START:
-    [
-      {
-        "title": "Homework 1",
-        "description": "Do some practice",
-        "timeInMinutes": 10,
-        "isCompleted": false
-      },
-      {
-        "title": "Homework 2",
-        "description": "Another exercise",
-        "timeInMinutes": 20,
-        "isCompleted": false
-      }
-    ]
+        Here is the previous homework assigned:
+        ${oldHomeworkDescriptions}
+
+        I have been told my speech is good, but I want to improve even more. 
+        What additional steps can I take to continue improving my speech?
+
+        Please provide three concise and actionable pieces of advice that I can work on daily. Start the advice with You seem to have Good Speech
+        Also, generate new homework tasks that are different from the ones I've already done or been assigned. 
+        Structure the response so that the first part contains the advice text and the second part, clearly labeled "JSON_START", includes the daily homework as a single JSON array.
+        Example format:
+        JSON_START:
+        [
+          {
+            "title": "Homework 1",
+            "description": "Do some practice",
+            "timeInMinutes": 10,
+            "isCompleted": false
+          },
+          {
+            "title": "Homework 2",
+            "description": "Another exercise",
+            "timeInMinutes": 20,
+            "isCompleted": false
+          }
+        ]
       `;
     } else if (diagnosis === "Stuttering") {
       prompt = `
         My name is ${user.name}, I work as a ${user.work}. My bio is: "${
         user.bio
       }". 
-        My speech illness is "${user.illness || "Stuttering"}". 
+        My speech illness is "Stuttering". 
         Here are my previous instructions:
         ${user.chat.messages
           .map((msg) => msg.AI_response)
           .filter(Boolean)
           .join(" ")}
-        I have a stuttering problem. How can I fix it? 
-        Please provide three concise, actionable points. 
-        Also, give me a daily homework schedule in JSON format as an array of objects with the following keys:
-        - "title": The title of the homework.
-        - "description": A brief description of the homework task.
-        - "timeInMinutes": The amount of time (in minutes) the homework should take.
-        - "isCompleted": Set it to false initially.
+
+        Here is the previous homework assigned:
+        ${oldHomeworkDescriptions}
+
+        I have a stuttering problem. How can I fix it?
+
+        Please provide three concise and actionable pieces of advice that I can work on daily.Start the advice with You seem to have Stuttering speech. 
+        Also, generate new homework tasks that are different from the ones I've already done or been assigned. 
+        Structure the response so that the first part contains the advice text and the second part, clearly labeled "JSON_START", includes the daily homework as a single JSON array.
+        Example format:
+        JSON_START:
+        [
+          {
+            "title": "Homework 1",
+            "description": "Do some practice",
+            "timeInMinutes": 10,
+            "isCompleted": false
+          },
+          {
+            "title": "Homework 2",
+            "description": "Another exercise",
+            "timeInMinutes": 20,
+            "isCompleted": false
+          }
+        ]
       `;
     }
 
-    // Fetch the AI response from ChatGPT (ensure it's returning advice and the JSON object)
+    // Fetch the AI response from ChatGPT
     const AI_response = await getAdvice(prompt);
 
     // Log the full AI response for debugging
@@ -178,9 +208,9 @@ export const updateAfterChatGPT = async (req, res) => {
       });
     }
 
-    let dailyHomework;
+    let newDailyHomework;
     try {
-      dailyHomework = JSON.parse(dailyHomeworkJson);
+      newDailyHomework = JSON.parse(dailyHomeworkJson);
     } catch (error) {
       return res.status(500).json({
         message: "Invalid AI response format",
@@ -191,15 +221,15 @@ export const updateAfterChatGPT = async (req, res) => {
     // Update the message object with the AI response
     message.AI_response = adviceText.trim(); // Save the advice text in the message
 
-    // Save the daily homework in the user's dailyHomework field
-    user.dailyHomework.push(...dailyHomework); // Save the array of homework objects
+    // Save the new daily homework in the user's dailyHomework field
+    user.dailyHomework.push(...newDailyHomework); // Save the array of homework objects
 
     await user.save();
 
-    // Return the advice text along with the saved daily homework
+    // Return the advice text along with the saved new daily homework
     res.status(200).json({
       message: message,
-      dailyHomework: dailyHomework, // This will contain the structured homework JSON array
+      dailyHomework: newDailyHomework, // This will contain the structured homework JSON array
     });
   } catch (err) {
     res
