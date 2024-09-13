@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import MessageSchema from "./Message.js";
-
+import HomeworkSchema from "./homework.js";
 const { Schema } = mongoose;
 
 // Regular expression for validating a Lebanese phone number starting with 81, 71, 76, 79, or 03
