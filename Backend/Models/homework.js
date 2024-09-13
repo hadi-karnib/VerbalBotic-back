@@ -19,10 +19,6 @@ const HomeworkSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  dueDate: {
-    type: Date,
-    required: true,
-  },
 });
 
 export default HomeworkSchema;
