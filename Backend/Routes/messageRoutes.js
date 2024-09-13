@@ -4,6 +4,7 @@ import {
   createVoiceNote,
   fetchChildChats,
   getMyChats,
+  markHomeworkAsCompleted,
   parentAdvice,
   transcribeAudioGoogle,
   updateAfterAnalysis,
@@ -26,5 +27,6 @@ router.get("/", authMiddleware, getMyChats);
 
 router.patch("/:messageId/analysis", authMiddleware, updateAfterAnalysis);
 router.patch("/:messageId/chatgpt", authMiddleware, updateAfterChatGPT);
+router.patch("/homework/:homeworkId", markHomeworkAsCompleted);
 
 export default router;
