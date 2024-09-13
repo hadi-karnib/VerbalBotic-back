@@ -478,31 +478,54 @@ export const adminMessages = async (req, res) => {
 };
 
 export const markHomeworkAsCompleted = async (req, res) => {
-  const { homeworkId } = req.params; // Assuming the homework ID is passed as a parameter
+  const { homeworkId } = req.body;
+
+  console.log("Received homeworkId:", homeworkId); // Log received homework ID
 
   try {
-    // Fetch the user from the token
+    // Find the user from the token
     const user = await User.findById(req.user._id).select("dailyHomework");
 
     if (!user) {
+      console.log("User not found"); // Log if user is not found
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Find the specific daily homework by ID
-    const homework = user.dailyHomework.id(homeworkId);
+    // Log the full dailyHomework array for debugging
+    console.log("Full dailyHomework array:", user.dailyHomework);
 
+    // Ensure that user has a dailyHomework array
+    if (!user.dailyHomework || !Array.isArray(user.dailyHomework)) {
+      console.log("No homework found"); // Log if no homework exists
+      return res.status(404).json({ message: "No homework found" });
+    }
+
+    // Log the individual homework IDs for better debugging
+    user.dailyHomework.forEach((hw) => {
+      console.log(`Homework ID in DB: ${hw._id}`); // Log each homework _id
+    });
+
+    // Find the specific homework by its _id
+    const homework = user.dailyHomework.find(
+      (hw) => hw._id && hw._id.toString() === homeworkId.toString()
+    );
+
+    // Log if no homework is found
     if (!homework) {
+      console.log(`Homework with ID ${homeworkId} not found`);
       return res.status(404).json({ message: "Homework not found" });
     }
 
-    // Update the isCompleted field to true
+    // Mark homework as completed
     homework.isCompleted = true;
 
-    // Save the user's updated record
+    // Save the updated user record
     await user.save();
 
+    // Respond with success message
     res.status(200).json({ message: "Homework marked as completed", homework });
   } catch (err) {
+    console.error("Error in markHomeworkAsCompleted:", err); // Log the error details
     res.status(500).json({
       message: "Failed to mark homework as completed",
       error: err.message,
