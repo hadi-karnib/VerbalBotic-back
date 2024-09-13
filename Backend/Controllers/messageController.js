@@ -140,13 +140,13 @@ export const updateAfterChatGPT = async (req, res) => {
         JSON_START:
         [
           {
-            "title": "Homework 1",
+            "title": "Name of the exercise",
             "description": "Do some practice",
             "timeInMinutes": 10,
             "isCompleted": false
           },
           {
-            "title": "Homework 2",
+            "title": "Name of the excercise",
             "description": "Another exercise",
             "timeInMinutes": 20,
             "isCompleted": false
@@ -177,13 +177,13 @@ export const updateAfterChatGPT = async (req, res) => {
         JSON_START:
         [
           {
-            "title": "Homework 1",
+            "title": "Name of the excercise",
             "description": "Do some practice",
             "timeInMinutes": 10,
             "isCompleted": false
           },
           {
-            "title": "Homework 2",
+            "title": "Name of the excercise",
             "description": "Another exercise",
             "timeInMinutes": 20,
             "isCompleted": false
