@@ -476,3 +476,36 @@ export const adminMessages = async (req, res) => {
     });
   }
 };
+
+export const markHomeworkAsCompleted = async (req, res) => {
+  const { homeworkId } = req.params; // Assuming the homework ID is passed as a parameter
+
+  try {
+    // Fetch the user from the token
+    const user = await User.findById(req.user._id).select("dailyHomework");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the specific daily homework by ID
+    const homework = user.dailyHomework.id(homeworkId);
+
+    if (!homework) {
+      return res.status(404).json({ message: "Homework not found" });
+    }
+
+    // Update the isCompleted field to true
+    homework.isCompleted = true;
+
+    // Save the user's updated record
+    await user.save();
+
+    res.status(200).json({ message: "Homework marked as completed", homework });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to mark homework as completed",
+      error: err.message,
+    });
+  }
+};
