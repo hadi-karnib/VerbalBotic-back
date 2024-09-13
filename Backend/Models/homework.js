@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-// Define Homework schema
 const HomeworkSchema = new Schema({
   title: {
     type: String,
@@ -26,5 +25,4 @@ const HomeworkSchema = new Schema({
   },
 });
 
-// Export the schema
 export default HomeworkSchema;
