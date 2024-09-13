@@ -4,6 +4,7 @@ import {
   createVoiceNote,
   fetchChildChats,
   getMyChats,
+  getUserDailyHomework,
   markHomeworkAsCompleted,
   parentAdvice,
   transcribeAudioGoogle,
@@ -24,7 +25,7 @@ router.post("/parentAdvice", authMiddleware, parentMiddleware, parentAdvice);
 router.post("/parentMessage", authMiddleware, parentMiddleware, adminMessages);
 
 router.get("/", authMiddleware, getMyChats);
-
+router.get("/getHomework", authMiddleware, getUserDailyHomework);
 router.patch("/:messageId/analysis", authMiddleware, updateAfterAnalysis);
 router.patch("/:messageId/chatgpt", authMiddleware, updateAfterChatGPT);
 router.patch("/homework", authMiddleware, markHomeworkAsCompleted);
