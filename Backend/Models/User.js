@@ -72,6 +72,10 @@ const UserSchema = new Schema(
         select: false,
       },
     },
+    dailyHomework: {
+      type: [HomeworkSchema],
+      default: [],
+    },
     lastLogin: {
       type: Date,
       required: false,
