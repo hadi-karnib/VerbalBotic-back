@@ -88,7 +88,7 @@ export const updateAfterChatGPT = async (req, res) => {
 
   try {
     const user = await User.findById(req.user._id).select(
-      "chat messages name age bio work illness"
+      "chat messages name age bio work illness dailyHomework"
     );
 
     if (!user) {
@@ -105,31 +105,41 @@ export const updateAfterChatGPT = async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // console.log(
-    //   user.chat.messages
-    //     .map((msg) => msg.AI_response)
-    //     .filter(Boolean)
-    //     .join(" ")
-    // );
     let prompt = "";
     if (diagnosis === "Good Speech") {
       prompt = `
-        My name is ${user.name}, I work as a ${user.work}. My bio is: "${
+         My name is ${user.name}, I work as a ${user.work}. My bio is: "${
         user.bio
       }". 
-        My speech illness was diagnosed as "${diagnosis}". 
-        Here are my previous instructions:
-        ${user.chat.messages
-          .map((msg) => msg.AI_response)
-          .filter(Boolean)
-          .join(" ")}
-        I have been told my speech is good, but I want to improve even more. 
-        What additional steps can I take to continue improving my speech?
-        Provide three concise and actionable pieces of advice that I can work on daily. 
-        Also, include a small homework schedule to follow. 
-        Be creative and specific to my work if possible.
-        Dont't tell me to seek a specialist.
-        Start the message with "You seem to have Good Speech"
+    My speech illness was diagnosed as "${diagnosis}". 
+    Here are my previous instructions:
+    ${user.chat.messages
+      .map((msg) => msg.AI_response)
+      .filter(Boolean)
+      .join(" ")}
+    I have been told my speech is good, but I want to improve even more. 
+    What additional steps can I take to continue improving my speech?
+
+    Provide three concise and actionable pieces of advice that I can work on daily. 
+    Also, include a small homework schedule. 
+    Structure the response so that the first part contains the advice text and the second part, clearly labeled "JSON_START", includes the daily homework as a single JSON array.
+    Example format:
+    "Here is the advice part..." 
+    JSON_START:
+    [
+      {
+        "title": "Homework 1",
+        "description": "Do some practice",
+        "timeInMinutes": 10,
+        "isCompleted": false
+      },
+      {
+        "title": "Homework 2",
+        "description": "Another exercise",
+        "timeInMinutes": 20,
+        "isCompleted": false
+      }
+    ]
       `;
     } else if (diagnosis === "Stuttering") {
       prompt = `
@@ -144,19 +154,53 @@ export const updateAfterChatGPT = async (req, res) => {
           .join(" ")}
         I have a stuttering problem. How can I fix it? 
         Please provide three concise, actionable points. 
-        Also, give me a daily homework schedule to follow.
-        Be direct, and make sure the advice is applicable to my daily work.
-        Start the message with "You seem to have Stuttering Speech"
-
+        Also, give me a daily homework schedule in JSON format as an array of objects with the following keys:
+        - "title": The title of the homework.
+        - "description": A brief description of the homework task.
+        - "timeInMinutes": The amount of time (in minutes) the homework should take.
+        - "isCompleted": Set it to false initially.
       `;
     }
 
+    // Fetch the AI response from ChatGPT (ensure it's returning advice and the JSON object)
     const AI_response = await getAdvice(prompt);
-    message.AI_response = AI_response;
+
+    // Log the full AI response for debugging
+    console.log("Full AI Response:", AI_response);
+
+    // Split AI response between advice text and daily homework
+    const [adviceText, dailyHomeworkJson] = AI_response.split("JSON_START:");
+
+    if (!dailyHomeworkJson) {
+      return res.status(500).json({
+        message: "Invalid AI response format",
+        error: "Homework JSON part missing from the AI response",
+      });
+    }
+
+    let dailyHomework;
+    try {
+      dailyHomework = JSON.parse(dailyHomeworkJson);
+    } catch (error) {
+      return res.status(500).json({
+        message: "Invalid AI response format",
+        error: error.message,
+      });
+    }
+
+    // Update the message object with the AI response
+    message.AI_response = adviceText.trim(); // Save the advice text in the message
+
+    // Save the daily homework in the user's dailyHomework field
+    user.dailyHomework.push(...dailyHomework); // Save the array of homework objects
 
     await user.save();
 
-    res.status(200).json(message);
+    // Return the advice text along with the saved daily homework
+    res.status(200).json({
+      message: message,
+      dailyHomework: dailyHomework, // This will contain the structured homework JSON array
+    });
   } catch (err) {
     res
       .status(500)
