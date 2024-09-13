@@ -1,0 +1,10 @@
+torch 
+torchvision 
+torchaudio 
+transformers 
+fastapi 
+uvicorn
+python-multipart
+pydub
+fuzzywuzzy
+sentence_transformers
