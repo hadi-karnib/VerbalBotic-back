@@ -532,3 +532,28 @@ export const markHomeworkAsCompleted = async (req, res) => {
     });
   }
 };
+export const getUserDailyHomework = async (req, res) => {
+  try {
+    // Find the user by their ID from the token
+    const user = await User.findById(req.user._id).select("dailyHomework");
+
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user has any dailyHomework
+    if (!user.dailyHomework || !user.dailyHomework.length) {
+      return res.status(404).json({ message: "No homework found" });
+    }
+
+    // Return the user's dailyHomework
+    res.status(200).json(user.dailyHomework);
+  } catch (err) {
+    // Handle any errors that occur during the request
+    res.status(500).json({
+      message: "Failed to retrieve daily homework",
+      error: err.message,
+    });
+  }
+};
