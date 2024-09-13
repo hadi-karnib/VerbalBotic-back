@@ -19,3 +19,13 @@ export const authMiddleware = async (req, res, next) => {
     res.status(401).json({ message: "Token is not valid" });
   }
 };
+
+export const parentMiddleware = async (req, res, next) => {
+  if (req.user && req.user.UserType === "parent") {
+    next();
+  } else {
+    return res
+      .status(403)
+      .json({ message: "Access denied, only parents are allowed" });
+  }
+};

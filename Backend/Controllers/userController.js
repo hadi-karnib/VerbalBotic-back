@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../Models/User.js";
 import { generateToken } from "../Middleware/authToken.js";
+import moment from "moment";
 
 export const signup = async (req, res) => {
   const { name, age, illness, UserType, email, password, phoneNumber } =
@@ -44,7 +45,7 @@ export const signup = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.status(201).json({ success: true, token });
+    res.status(201).json({ success: true, token, UserType: user.UserType });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -68,9 +69,16 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    await calcStreak(user);
+
     const token = generateToken(user);
 
-    res.status(200).json({ success: true, token });
+    res.status(200).json({
+      success: true,
+      token,
+      streak: user.streak,
+      UserType: user.UserType,
+    });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -212,4 +220,23 @@ export const updateUser = async (req, res) => {
       error: err.message,
     });
   }
+};
+
+const calcStreak = (user) => {
+  const currentDate = moment().startOf("day");
+  const lastLoginDate = moment(user.lastLogin).startOf("day");
+
+  const daysDifference = currentDate.diff(lastLoginDate, "days");
+
+  if (daysDifference === 1) {
+    user.streak = (user.streak || 0) + 1;
+  } else if (daysDifference > 1) {
+    user.streak = 1;
+  } else if (daysDifference === 0 && !user.streak) {
+    user.streak = 1;
+  }
+
+  user.lastLogin = moment().toDate();
+
+  return user.save();
 };

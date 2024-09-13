@@ -4,13 +4,21 @@ import {
   deleteChild,
   getChildren,
 } from "../Controllers/childController.js";
-import { authMiddleware } from "../Middleware/authMiddleware.js";
+import {
+  authMiddleware,
+  parentMiddleware,
+} from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/add", authMiddleware, addChild);
-router.get("/", authMiddleware, getChildren);
+router.post("/add", authMiddleware, parentMiddleware, addChild);
+router.get("/", authMiddleware, parentMiddleware, getChildren);
 
-router.delete("/delete/:childId", authMiddleware, deleteChild);
+router.delete(
+  "/delete/:childId",
+  authMiddleware,
+  parentMiddleware,
+  deleteChild
+);
 
 export default router;
