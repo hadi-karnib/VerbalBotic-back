@@ -246,11 +246,11 @@ export const getMyChats = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (!user.chat || !user.chat.messages.length) {
-      return res.status(404).json({ message: "No messages found" });
-    }
+    // If no messages are found, return an empty array
+    const messages =
+      user.chat && user.chat.messages.length ? user.chat.messages : [];
 
-    res.status(200).json(user.chat.messages);
+    res.status(200).json(messages);
   } catch (err) {
     res
       .status(500)
@@ -369,13 +369,11 @@ export const fetchChildChats = async (req, res) => {
       return res.status(404).json({ message: "Child user not found" });
     }
 
-    if (!child.chat || !child.chat.messages.length) {
-      return res
-        .status(404)
-        .json({ message: "No messages found for this child" });
-    }
+    // Return an empty array if there are no messages instead of 404
+    const messages =
+      child.chat && child.chat.messages.length ? child.chat.messages : [];
 
-    res.status(200).json(child.chat.messages);
+    res.status(200).json(messages);
   } catch (err) {
     console.error("Error retrieving child's chats:", err);
     res.status(500).json({
@@ -542,13 +540,12 @@ export const getUserDailyHomework = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the user has any dailyHomework
-    if (!user.dailyHomework || !user.dailyHomework.length) {
-      return res.status(404).json({ message: "No homework found" });
-    }
+    // Return an empty array if no homework is found
+    const dailyHomework =
+      user.dailyHomework && user.dailyHomework.length ? user.dailyHomework : [];
 
-    // Return the user's dailyHomework
-    res.status(200).json(user.dailyHomework);
+    // Return the user's dailyHomework or empty array
+    res.status(200).json(dailyHomework);
   } catch (err) {
     // Handle any errors that occur during the request
     res.status(500).json({
