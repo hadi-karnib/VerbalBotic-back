@@ -41,6 +41,6 @@ app.use("/api/children", childrenRoutes);
 app.use("/api/messages", messageRoutes);
 
 const PORT = process.env.PORT || 4001;
-app.listen(PORT, () => {
+app.listen(4000, () => {
   console.log(`Server is running on port ${PORT}`);
 });
